@@ -1,20 +1,7 @@
 import {createContext, ReactNode, useCallback, useContext, useState} from "react";
 import AuthService from "@/services/AuthService.ts";
-
-export interface IUser {
-    login: string,
-    image: string | null,
-    id: string,
-    accessToken: string,
-    refreshToken: string,
-}
-
-export interface IAuthContext {
-    user: IUser | null,
-    login: (login: string, password: string) => Promise<void>,
-    logout: () => Promise<void>,
-    isAuth: boolean,
-}
+import axios from "axios";
+import {IAuthContext, IAuthResponse, IUser} from "@/models/auth.ts";
 
 const AuthContext = createContext<IAuthContext | null>(null)
 
@@ -40,11 +27,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     const login = useCallback(async (login: string, password: string) => {
         try {
             const response = await AuthService.login(login, password)
+            console.log(response)
             setStoredToken(response.data.user.accessToken)
             setUser(response.data.user)
         } catch (e) {
-            // @ts-ignore
-            console.log(e.response)
+            console.error(e)
         }
     }, [])
 
@@ -54,13 +41,25 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             setStoredToken(null)
             setUser(null)
         } catch (e) {
-            // @ts-ignore
-            console.log(e.response)
+            console.error(e)
+        }
+    }, [])
+
+    const checkAuth = useCallback(async () => {
+        try {
+            const response = await axios.get<IAuthResponse>('http://localhost:3000/auth/refresh', {
+                withCredentials: true
+            })
+            console.log(response)
+            setStoredToken(response.data.user.accessToken)
+            setUser(response.data.user)
+        } catch (e) {
+            console.error(e)
         }
     }, [])
 
     return (
-        <AuthContext.Provider value={{user, login, logout, isAuth}}>
+        <AuthContext.Provider value={{user, login, logout, isAuth, checkAuth}}>
             {children}
         </AuthContext.Provider>
     )

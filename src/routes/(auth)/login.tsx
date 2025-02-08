@@ -1,20 +1,40 @@
-import {createFileRoute} from '@tanstack/react-router'
+import {createFileRoute, redirect} from '@tanstack/react-router'
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {useState} from "react";
 import {useAuth} from "@/components/auth.tsx";
+import {useForm, Controller, SubmitHandler} from "react-hook-form";
+
+interface ILoginForm {
+    login: string,
+    password: string,
+}
 
 export const Route = createFileRoute('/(auth)/login')({
+    beforeLoad: ({context}) => {
+        if (context.auth.isAuth) {
+            throw redirect({to: '/'});
+        }
+    },
     component: Login,
 })
 
 function Login() {
-    const [login, setLogin] = useState('')
-    const [password, setPassword] = useState('')
+    const {handleSubmit, control} = useForm<ILoginForm>({
+        defaultValues: {
+            login: '',
+            password: '',
+        }
+    })
 
     const auth = useAuth()
+    const navigate = Route.useNavigate()
+
+    const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
+        await auth.login(data.login, data.password)
+        await navigate({to: '/'})
+    }
 
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -24,35 +44,36 @@ function Login() {
                         <CardHeader className='text-2xl font-semibold'>Login</CardHeader>
                     </CardHeader>
                     <CardContent>
-                        <form>
+                        <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="flex flex-col gap-6">
                                 <div className='grid gap-2'>
                                     <Label htmlFor='login' className='font-semibold' >Username</Label>
-                                    <Input
-                                        id='login'
-                                        type='text'
-                                        placeholder='Username'
-                                        value={login}
-                                        onChange={(e) => setLogin(e.target.value)}
-                                        required
-                                    />
+                                    <Controller name='login' control={control} render={({field}) => (
+                                        <Input
+                                            {...field}
+                                            id='login'
+                                            type='text'
+                                            placeholder='Username'
+                                            required
+                                        />
+                                    )} />
                                 </div>
 
                                 <div className='grid gap-2'>
                                     <Label htmlFor='password' className='font-semibold' >Password</Label>
-                                    <Input
-                                        id='password'
-                                        type='password'
-                                        placeholder='Password'
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
+                                    <Controller name='password' control={control} render={({field}) => (
+                                        <Input
+                                            {...field}
+                                            id='password'
+                                            type='password'
+                                            placeholder='Password'
+                                            required
+                                        />
+                                    )} />
                                 </div>
 
-                                <Button type='submit' className='w-full font-semibold'>Login</Button>
+                                <Button type='submit' className='w-full font-semibold'>Login 😺</Button>
                             </div>
-
                         </form>
                     </CardContent>
                 </Card>
