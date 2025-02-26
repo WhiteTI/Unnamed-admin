@@ -47,7 +47,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await axios.get<IAuthResponse>('http://localhost:3000/auth/refresh', {
+            const response = await axios.get<IAuthResponse>('http://localhost:3001/auth/refresh', {
                 withCredentials: true
             })
             console.log(response)
