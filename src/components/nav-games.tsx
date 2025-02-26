@@ -13,8 +13,20 @@ import zzzIcon from '@/assets/img/zzz.png'
 
 const NavGames = () => {
     const games: {title: string, icon?: string, links?: {title: string, url: string}[]}[] = [
-        {title: 'Genshin Impact', icon: genshinIcon, links: [{title: 'Персонажи', url: '#'}, {title: 'Оружие', url: '#'}, {title: 'Артефакты', url: '#'}]},
-        {title: 'Honkai Star Rail', icon: hsrIcon, links: [{title: 'Персонажи', url: '#'}, {title: 'Конусы', url: '#'}, {title: 'Реликвии', url: '#'}]},
+        {title: 'Genshin Impact', icon: genshinIcon,
+            links: [
+                {title: 'Персонажи', url: '/dashboard/genshin-impact/characters'},
+                {title: 'Оружие', url: '/dashboard/genshin-impact/weapons'},
+                {title: 'Артефакты', url: '/dashboard/genshin-impact/artefacts'}
+            ]
+        },
+        {title: 'Honkai Star Rail', icon: hsrIcon,
+            links: [
+                {title: 'Персонажи', url: '/dashboard/star-rail/characters'},
+                {title: 'Конусы', url: '/dashboard/star-rail/light-cones'},
+                {title: 'Реликвии', url: '/dashboard/star-rail/relics'}
+            ]
+        },
         {title: 'Zenless Zone Zero', icon: zzzIcon},
     ]
 
