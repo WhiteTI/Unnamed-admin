@@ -24,11 +24,11 @@ const NavUser = () => {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton size='lg' className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                             <Avatar className='h-8 w-8 rounded-lg'>
-                                {user.image ? <AvatarImage src={user.image}/> : null}
+                                <AvatarImage src={user.image}/>
                                 <AvatarFallback className='rounded-lg'>W</AvatarFallback>
                             </Avatar>
                             <span className='truncate font-semibold'>
-                                {user.login}
+                                {user.username ? user.username : user.login}
                             </span>
                             <ChevronRight className='ml-auto size-4'/>
                         </SidebarMenuButton>
