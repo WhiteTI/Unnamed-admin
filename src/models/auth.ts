@@ -2,7 +2,8 @@ export interface IAuthResponse {
     message: string,
     user: {
         login: string,
-        image: string | null,
+        username?: string
+        image?: string,
         id: string,
         accessToken: string,
         refreshToken: string,
@@ -11,7 +12,8 @@ export interface IAuthResponse {
 
 export interface IUser {
     login: string,
-    image: string | null,
+    username?: string
+    image?: string,
     id: string,
     accessToken: string,
     refreshToken: string,
