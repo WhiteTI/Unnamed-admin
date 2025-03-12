@@ -1,6 +1,12 @@
-import {Sidebar, SidebarContent, SidebarFooter, SidebarHeader} from "@/components/ui/sidebar.tsx";
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+} from "@/components/ui/sidebar.tsx";
 import NavUser from "@/components/nav-user.tsx";
 import NavGames from "@/components/nav-games.tsx";
+import NavMenu from "@/components/nav-menu.tsx";
 
 const AppSidebar = () => {
 
@@ -11,6 +17,7 @@ const AppSidebar = () => {
             </SidebarHeader>
 
             <SidebarContent>
+                <NavMenu/>
                 <NavGames/>
             </SidebarContent>
 
