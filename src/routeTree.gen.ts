@@ -17,6 +17,10 @@ import { Route as LoginImport } from './routes/login'
 import { Route as appAuthImport } from './routes/(app)/_auth'
 import { Route as appAuthDashboardImport } from './routes/(app)/_auth.dashboard'
 import { Route as appAuthDashboardIndexImport } from './routes/(app)/_auth.dashboard.index'
+import { Route as appAuthDashboardGameWeaponsImport } from './routes/(app)/_auth.dashboard.$game.$weapons'
+import { Route as appAuthDashboardGameSetsImport } from './routes/(app)/_auth.dashboard.$game.$sets'
+import { Route as appAuthDashboardGameCharactersImport } from './routes/(app)/_auth.dashboard.$game.$characters'
+import { Route as appAuthDashboardGameCharactersNewImport } from './routes/(app)/_auth.dashboard.$game.$characters_.new'
 
 // Create Virtual Routes
 
@@ -51,6 +55,33 @@ const appAuthDashboardIndexRoute = appAuthDashboardIndexImport.update({
   path: '/',
   getParentRoute: () => appAuthDashboardRoute,
 } as any)
+
+const appAuthDashboardGameWeaponsRoute =
+  appAuthDashboardGameWeaponsImport.update({
+    id: '/$game/$weapons',
+    path: '/$game/$weapons',
+    getParentRoute: () => appAuthDashboardRoute,
+  } as any)
+
+const appAuthDashboardGameSetsRoute = appAuthDashboardGameSetsImport.update({
+  id: '/$game/$sets',
+  path: '/$game/$sets',
+  getParentRoute: () => appAuthDashboardRoute,
+} as any)
+
+const appAuthDashboardGameCharactersRoute =
+  appAuthDashboardGameCharactersImport.update({
+    id: '/$game/$characters',
+    path: '/$game/$characters',
+    getParentRoute: () => appAuthDashboardRoute,
+  } as any)
+
+const appAuthDashboardGameCharactersNewRoute =
+  appAuthDashboardGameCharactersNewImport.update({
+    id: '/$game/$characters_/new',
+    path: '/$game/$characters/new',
+    getParentRoute: () => appAuthDashboardRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -91,6 +122,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appAuthDashboardIndexImport
       parentRoute: typeof appAuthDashboardImport
     }
+    '/(app)/_auth/dashboard/$game/$characters': {
+      id: '/(app)/_auth/dashboard/$game/$characters'
+      path: '/$game/$characters'
+      fullPath: '/dashboard/$game/$characters'
+      preLoaderRoute: typeof appAuthDashboardGameCharactersImport
+      parentRoute: typeof appAuthDashboardImport
+    }
+    '/(app)/_auth/dashboard/$game/$sets': {
+      id: '/(app)/_auth/dashboard/$game/$sets'
+      path: '/$game/$sets'
+      fullPath: '/dashboard/$game/$sets'
+      preLoaderRoute: typeof appAuthDashboardGameSetsImport
+      parentRoute: typeof appAuthDashboardImport
+    }
+    '/(app)/_auth/dashboard/$game/$weapons': {
+      id: '/(app)/_auth/dashboard/$game/$weapons'
+      path: '/$game/$weapons'
+      fullPath: '/dashboard/$game/$weapons'
+      preLoaderRoute: typeof appAuthDashboardGameWeaponsImport
+      parentRoute: typeof appAuthDashboardImport
+    }
+    '/(app)/_auth/dashboard/$game/$characters_/new': {
+      id: '/(app)/_auth/dashboard/$game/$characters_/new'
+      path: '/$game/$characters/new'
+      fullPath: '/dashboard/$game/$characters/new'
+      preLoaderRoute: typeof appAuthDashboardGameCharactersNewImport
+      parentRoute: typeof appAuthDashboardImport
+    }
   }
 }
 
@@ -98,10 +157,19 @@ declare module '@tanstack/react-router' {
 
 interface appAuthDashboardRouteChildren {
   appAuthDashboardIndexRoute: typeof appAuthDashboardIndexRoute
+  appAuthDashboardGameCharactersRoute: typeof appAuthDashboardGameCharactersRoute
+  appAuthDashboardGameSetsRoute: typeof appAuthDashboardGameSetsRoute
+  appAuthDashboardGameWeaponsRoute: typeof appAuthDashboardGameWeaponsRoute
+  appAuthDashboardGameCharactersNewRoute: typeof appAuthDashboardGameCharactersNewRoute
 }
 
 const appAuthDashboardRouteChildren: appAuthDashboardRouteChildren = {
   appAuthDashboardIndexRoute: appAuthDashboardIndexRoute,
+  appAuthDashboardGameCharactersRoute: appAuthDashboardGameCharactersRoute,
+  appAuthDashboardGameSetsRoute: appAuthDashboardGameSetsRoute,
+  appAuthDashboardGameWeaponsRoute: appAuthDashboardGameWeaponsRoute,
+  appAuthDashboardGameCharactersNewRoute:
+    appAuthDashboardGameCharactersNewRoute,
 }
 
 const appAuthDashboardRouteWithChildren =
@@ -133,12 +201,20 @@ export interface FileRoutesByFullPath {
   '/': typeof appAuthRouteWithChildren
   '/dashboard': typeof appAuthDashboardRouteWithChildren
   '/dashboard/': typeof appAuthDashboardIndexRoute
+  '/dashboard/$game/$characters': typeof appAuthDashboardGameCharactersRoute
+  '/dashboard/$game/$sets': typeof appAuthDashboardGameSetsRoute
+  '/dashboard/$game/$weapons': typeof appAuthDashboardGameWeaponsRoute
+  '/dashboard/$game/$characters/new': typeof appAuthDashboardGameCharactersNewRoute
 }
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof appAuthRouteWithChildren
   '/dashboard': typeof appAuthDashboardIndexRoute
+  '/dashboard/$game/$characters': typeof appAuthDashboardGameCharactersRoute
+  '/dashboard/$game/$sets': typeof appAuthDashboardGameSetsRoute
+  '/dashboard/$game/$weapons': typeof appAuthDashboardGameWeaponsRoute
+  '/dashboard/$game/$characters/new': typeof appAuthDashboardGameCharactersNewRoute
 }
 
 export interface FileRoutesById {
@@ -148,13 +224,32 @@ export interface FileRoutesById {
   '/(app)/_auth': typeof appAuthRouteWithChildren
   '/(app)/_auth/dashboard': typeof appAuthDashboardRouteWithChildren
   '/(app)/_auth/dashboard/': typeof appAuthDashboardIndexRoute
+  '/(app)/_auth/dashboard/$game/$characters': typeof appAuthDashboardGameCharactersRoute
+  '/(app)/_auth/dashboard/$game/$sets': typeof appAuthDashboardGameSetsRoute
+  '/(app)/_auth/dashboard/$game/$weapons': typeof appAuthDashboardGameWeaponsRoute
+  '/(app)/_auth/dashboard/$game/$characters_/new': typeof appAuthDashboardGameCharactersNewRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/dashboard' | '/dashboard/'
+  fullPaths:
+    | '/login'
+    | '/'
+    | '/dashboard'
+    | '/dashboard/'
+    | '/dashboard/$game/$characters'
+    | '/dashboard/$game/$sets'
+    | '/dashboard/$game/$weapons'
+    | '/dashboard/$game/$characters/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/dashboard'
+  to:
+    | '/login'
+    | '/'
+    | '/dashboard'
+    | '/dashboard/$game/$characters'
+    | '/dashboard/$game/$sets'
+    | '/dashboard/$game/$weapons'
+    | '/dashboard/$game/$characters/new'
   id:
     | '__root__'
     | '/login'
@@ -162,6 +257,10 @@ export interface FileRouteTypes {
     | '/(app)/_auth'
     | '/(app)/_auth/dashboard'
     | '/(app)/_auth/dashboard/'
+    | '/(app)/_auth/dashboard/$game/$characters'
+    | '/(app)/_auth/dashboard/$game/$sets'
+    | '/(app)/_auth/dashboard/$game/$weapons'
+    | '/(app)/_auth/dashboard/$game/$characters_/new'
   fileRoutesById: FileRoutesById
 }
 
@@ -209,11 +308,31 @@ export const routeTree = rootRoute
       "filePath": "(app)/_auth.dashboard.tsx",
       "parent": "/(app)/_auth",
       "children": [
-        "/(app)/_auth/dashboard/"
+        "/(app)/_auth/dashboard/",
+        "/(app)/_auth/dashboard/$game/$characters",
+        "/(app)/_auth/dashboard/$game/$sets",
+        "/(app)/_auth/dashboard/$game/$weapons",
+        "/(app)/_auth/dashboard/$game/$characters_/new"
       ]
     },
     "/(app)/_auth/dashboard/": {
       "filePath": "(app)/_auth.dashboard.index.tsx",
+      "parent": "/(app)/_auth/dashboard"
+    },
+    "/(app)/_auth/dashboard/$game/$characters": {
+      "filePath": "(app)/_auth.dashboard.$game.$characters.tsx",
+      "parent": "/(app)/_auth/dashboard"
+    },
+    "/(app)/_auth/dashboard/$game/$sets": {
+      "filePath": "(app)/_auth.dashboard.$game.$sets.tsx",
+      "parent": "/(app)/_auth/dashboard"
+    },
+    "/(app)/_auth/dashboard/$game/$weapons": {
+      "filePath": "(app)/_auth.dashboard.$game.$weapons.tsx",
+      "parent": "/(app)/_auth/dashboard"
+    },
+    "/(app)/_auth/dashboard/$game/$characters_/new": {
+      "filePath": "(app)/_auth.dashboard.$game.$characters_.new.tsx",
       "parent": "/(app)/_auth/dashboard"
     }
   }
