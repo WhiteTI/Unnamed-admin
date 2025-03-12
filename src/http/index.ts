@@ -4,7 +4,7 @@ import {IAuthResponse} from "@/models/auth.ts";
 
 const api = axios.create({
     withCredentials: true,
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3001",
 })
 
 api.interceptors.request.use((config) => {
@@ -19,7 +19,7 @@ api.interceptors.response.use((config) => {
     if (error.response && error.response.status === 401 && !error.config.isRetry) {
         originalRequest.isRetry = true
         try {
-            const response = await axios.get<IAuthResponse>('http://localhost:3000/api/auth/refresh', {
+            const response = await axios.get<IAuthResponse>('http://localhost:3001/auth/refresh', {
                 withCredentials: true
             })
             setStoredToken(response.data.user.accessToken)
