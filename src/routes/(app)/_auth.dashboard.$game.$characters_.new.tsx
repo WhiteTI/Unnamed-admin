@@ -6,7 +6,21 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {Button} from "@/components/ui/button.tsx";
 import ImagePreview from "@/components/image-preview.tsx";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion.tsx";
-import {MinusIcon, PlusIcon} from "lucide-react";
+import {PlusIcon} from "lucide-react";
+import stats from '@/components/stats.ts'
+import {useState} from "react";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip.tsx";
+import Editor from "@/components/editor.tsx";
+import {Textarea} from "@/components/ui/textarea.tsx";
+import {Separator} from "@/components/ui/separator.tsx";
+
+type Stat = {
+    image: string
+    name: string
+    stat: {
+        [key: string]: string[] | null
+    }
+}
 
 export const Route = createFileRoute(
     '/(app)/_auth/dashboard/$game/$characters_/new',
@@ -15,6 +29,8 @@ export const Route = createFileRoute(
 })
 
 function RouteComponent() {
+    const [additionalStat, setAdditionalStat] = useState('')
+    const [additionalStatError, setAdditionalStatError] = useState('')
 
     const form = useForm({
         defaultValues: {
@@ -23,6 +39,7 @@ function RouteComponent() {
             image: "",
             bgImage: "",
             listImage: "",
+            description: "",
             rarity: "",
             region: "",
             element: "",
@@ -54,6 +71,22 @@ function RouteComponent() {
         name: 'constellations'
     })
 
+    const setAdditionalStatInForm = (event: React.MouseEvent<HTMLButtonElement>, stat: Stat) => {
+        event.preventDefault()
+
+        const rarity: string = form.getValues('rarity')
+
+        if (stat.stat[rarity]) {
+            setAdditionalStat(stat.name)
+            setAdditionalStatError('')
+
+            stat.stat[rarity].map((item, i) => {
+                form.setValue(`levels.${i}.additionalStat`, `${stat.image},${stat.name},${item}`)
+            })
+        } else {
+            setAdditionalStatError(`Значения ${stat.name} для редкости ${rarity}⭐ не существует`)
+        }
+    }
 
     const onSubmit = async (data: object) => {
         console.log(data)
@@ -121,7 +154,15 @@ function RouteComponent() {
                         )} />
                     </div>
 
-                    // Description
+                    <FormField control={form.control} name='description' render={({field}) => (
+                        <FormItem className='flex-grow'>
+                            <FormLabel>Описание персонажа</FormLabel>
+                            <FormControl>
+                                <Editor value={field.value} onChange={field.onChange}/>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )} />
 
                     <div className='flex items-center justify-around'>
                         <FormField control={form.control} name='rarity' render={({field}) => (
@@ -218,7 +259,30 @@ function RouteComponent() {
                         )} />
                     </div>
 
-                    // Additional Stats
+                    <div>
+                        <div className='grid grid-cols-8 auto-rows-auto gap-4 justify-items-center'>
+                            {Object.entries(stats).map(([key, value]) => (
+                                <TooltipProvider key={key}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button variant='outline' className='h-14 w-14' size='icon'
+                                                    onClick={(event) => setAdditionalStatInForm(event, value)}
+                                                    style={{
+                                                        transform: additionalStat.includes(value.name) ? 'scale(1.3)' : ''
+                                                    }}
+                                            >
+                                                <img src={value.image} alt={value.name} className='w-10 h-10'/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent><p>{value.name}</p></TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            ))}
+                        </div>
+                        <div className='text-center text-xl font-medium my-4 text-red-600'>
+                            <span>{additionalStatError}</span>
+                        </div>
+                    </div>
 
                     <Accordion type='multiple'>
                         <AccordionItem value='levels'>
@@ -275,49 +339,64 @@ function RouteComponent() {
                             <AccordionContent>
                                 {skills.map((skill, i) => (
                                     <div key={skill.id}>
-                                        <FormField control={form.control} name={`skills.${i}.name`} render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Название</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field}/>
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )} />
+                                        <div className='flex gap-4 mb-4'>
+                                            <FormField control={form.control} name={`skills.${i}.image`} render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Image</FormLabel>
+                                                    <FormControl>
+                                                        <ImagePreview name={field.name} onChange={field.onChange} ref={field.ref} height='h-20' width='w-20'/>
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )} />
+
+                                            <FormField control={form.control} name={`skills.${i}.name`} render={({field}) => (
+                                                <FormItem className='flex-grow'>
+                                                    <FormLabel>Название</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field}/>
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )} />
+                                        </div>
 
                                         <FormField control={form.control} name={`skills.${i}.description`} render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Описание</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field}/>
+                                                    <Editor value={field.value} onChange={field.onChange}/>
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )} />
 
-                                        {skill.skillStats.map((stat, k: number) => (
-                                            <div key={k}>
-                                                <FormField control={form.control} name={`skills.${i}.skillStats.${k}.level`} render={({field}) => (
-                                                    <FormItem>
-                                                        <FormLabel>Уровень</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field}/>
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )} />
+                                        <div className='grid grid-cols-2 auto-rows-auto gap-3'>
+                                            {skill.skillStats.map((stat, k: number) => (
+                                                <div key={k} className='m-2'>
+                                                    <FormField control={form.control} name={`skills.${i}.skillStats.${k}.level`} render={({field}) => (
+                                                        <FormItem>
+                                                            <FormLabel>Уровень</FormLabel>
+                                                            <FormControl>
+                                                                <Input {...field}/>
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )} />
 
-                                                <FormField control={form.control} name={`skills.${i}.skillStats.${k}.value`} render={({field}) => (
-                                                    <FormItem>
-                                                        <FormLabel>Проценты</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field}/>
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )} />
-                                            </div>
-                                        ))}
+                                                    <FormField control={form.control} name={`skills.${i}.skillStats.${k}.value`} render={({field}) => (
+                                                        <FormItem>
+                                                            <FormLabel>Проценты</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea {...field}/>
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <Separator className='m-5'/>
                                     </div>
                                 ))}
                             </AccordionContent>
@@ -355,7 +434,7 @@ function RouteComponent() {
                                                 <FormItem>
                                                     <FormLabel>Описание</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field}/>
+                                                        <Editor value={field.value} onChange={field.onChange}/>
                                                     </FormControl>
                                                     <FormMessage/>
                                                 </FormItem>
@@ -402,7 +481,7 @@ function RouteComponent() {
                                                 <FormItem>
                                                     <FormLabel>Описание</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field}/>
+                                                        <Editor value={field.value} onChange={field.onChange}/>
                                                     </FormControl>
                                                     <FormMessage/>
                                                 </FormItem>
