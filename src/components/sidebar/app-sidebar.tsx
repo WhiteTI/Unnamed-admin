@@ -4,9 +4,9 @@ import {
     SidebarFooter,
     SidebarHeader,
 } from "@/components/ui/sidebar.tsx";
-import NavUser from "@/components/nav-user.tsx";
-import NavGames from "@/components/nav-games.tsx";
-import NavMenu from "@/components/nav-menu.tsx";
+import NavUser from "@/components/sidebar/nav-user.tsx";
+import NavGames from "@/components/sidebar/nav-games.tsx";
+import NavMenu from "@/components/sidebar/nav-menu.tsx";
 import logo from '@/assets/img/logo.jpg'
 
 const AppSidebar = () => {
