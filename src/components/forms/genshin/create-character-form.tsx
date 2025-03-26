@@ -45,7 +45,7 @@ const CreateCharacterForm = () => {
             bgImage: undefined,
             listImage: undefined,
             description: "",
-            rarity: undefined,
+            rarity: "",
             region: "",
             elementId: "",
             weaponTypeId: "",
@@ -79,7 +79,7 @@ const CreateCharacterForm = () => {
     const setAdditionalStatInForm = (event: React.MouseEvent<HTMLButtonElement>, stat: Stat) => {
         event.preventDefault()
 
-        const rarity = form.getValues('rarity').toString()
+        const rarity = form.getValues('rarity')
 
         if (stat.stat[rarity]) {
             setAdditionalStat(stat.name)
@@ -94,15 +94,14 @@ const CreateCharacterForm = () => {
     }
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const levels = data.levels.map(item => ({level: +item.level, health: +item.health, attack: +item.attack, defense: +item.defense, additionalStat: item.additionalStat.split(',')}))
+        const levels = data.levels.map(item => ({...item, additionalStat: item.additionalStat.split(',')}))
         const skills = data.skills.map(skill => {
             const skillStats = skill.skillStats.map((item => ({level: item.level, value: item.value.split(';')})))
             return {...skill, skillStats: skillStats}
         })
-        // data.levels = data.levels.map(item => ({level: +item.level, health: +item.health, attack: +item.attack, defense: +item.defense, additionalStat: item.additionalStat.split(',')}))
-        // data.skills = data.skills.map(skill => skill.skillStats.map((item => ({level: item.level, value: item.value.split(';')}))))
+        const rarity = parseInt(data.rarity)
 
-        const character = {...data, levels: levels, skills: skills};
+        const character = {...data, rarity: rarity, levels: levels, skills: skills};
         console.log(character)
     }
 
@@ -181,7 +180,7 @@ const CreateCharacterForm = () => {
                         <FormItem>
                             <FormLabel>Редкость</FormLabel>
                             <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value.toString()} name={field.name}>
+                                <Select onValueChange={field.onChange} value={field.value} name={field.name}>
                                     <SelectTrigger className="w-[70px]">
                                         <SelectValue placeholder="⭐" />
                                     </SelectTrigger>

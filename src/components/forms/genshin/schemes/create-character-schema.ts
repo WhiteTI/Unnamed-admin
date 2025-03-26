@@ -8,7 +8,7 @@ const formSchema = z.object({
     image: imageSchema,
     bgImage: imageSchema,
     listImage: imageSchema,
-    rarity: z.number(),
+    rarity: z.string(),
     region: z.string(),
     elementId: z.string(),
     weaponTypeId: z.string(),
@@ -20,7 +20,7 @@ const formSchema = z.object({
         additionalStat: z.string()
     }).array(),
     skills: z.object({
-        name: z.string().min(2),
+        name: z.string(),
         image: imageSchema,
         description: z.string(),
         skillStats: z.object({
@@ -29,12 +29,12 @@ const formSchema = z.object({
         }).array()
     }).array(),
     passiveSkills: z.object({
-        name: z.string().min(2),
+        name: z.string(),
         image: imageSchema,
         description: z.string(),
     }).array(),
     constellations: z.object({
-        name: z.string().min(2),
+        name: z.string(),
         image: imageSchema,
         description: z.string(),
     }).array(),
