@@ -3,14 +3,14 @@ import {ControllerRenderProps} from 'react-hook-form'
 import {Input} from "@/components/ui/input.tsx";
 import {ImageUpIcon} from "lucide-react";
 
-interface IProps {
+type Props = {
     name: string
     onChange: ControllerRenderProps['onChange']
     width?: string
     height?: string
 }
 
-const ImagePreview = forwardRef<HTMLInputElement, IProps>(({name, onChange, width = 'w-80', height = 'h-80'}, ref) => {
+const ImagePreview = forwardRef<HTMLInputElement, Props>(({name, onChange, width = 'w-80', height = 'h-80'}, ref) => {
     const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
     const previewRef = useRef<HTMLDivElement>(null)
 
