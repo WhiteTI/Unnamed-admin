@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form.tsx";
 import ImagePreview from "@/components/image-preview.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import Editor from "@/components/editor.tsx";
+import Editor from "@/components/editor/editor.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import stats from "@/components/stats.ts";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip.tsx";
@@ -108,7 +108,6 @@ const CreateCharacterForm = () => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-                <h2>Обязательные поля (っ °Д °;)っ</h2>
                 <div className='flex gap-8'>
                     <FormField control={form.control} name='image' render={({field}) => (
                         <FormItem>
