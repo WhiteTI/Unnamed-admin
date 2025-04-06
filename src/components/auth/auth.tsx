@@ -2,23 +2,9 @@ import {createContext, ReactNode, useCallback, useContext, useState} from "react
 import AuthService from "@/services/AuthService.ts";
 import axios from "axios";
 import {IAuthContext, IAuthResponse, IUser} from "@/models/auth.ts";
+import {setStoredToken} from "@/utils/local-storage.ts";
 
 const AuthContext = createContext<IAuthContext | null>(null)
-
-const key = 'token'
-
-export function getStoredToken() {
-    return localStorage.getItem(key)
-}
-
-export function setStoredToken(token: string | null) {
-    if (token) {
-        localStorage.setItem(key, token)
-    } else {
-        localStorage.removeItem(key)
-    }
-
-}
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
     const [user, setUser] = useState<IUser | null>(null)
@@ -47,7 +33,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await axios.get<IAuthResponse>('http://localhost:3001/auth/refresh', {
+            const response = await axios.get<IAuthResponse>('http://localhost:3000/proxy/auth/refresh', {
                 withCredentials: true
             })
             console.log(response)

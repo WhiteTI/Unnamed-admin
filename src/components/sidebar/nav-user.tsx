@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import {ChevronRight, LogOut, User} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
-import {useAuth} from "@/components/auth.tsx";
+import {useAuth} from "@/components/auth/auth.tsx";
 
 const NavUser = () => {
     const {user, logout} = useAuth();

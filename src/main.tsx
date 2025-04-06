@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from './routeTree.gen.ts'
-import { AuthProvider, useAuth } from "@/components/auth.tsx";
+import { AuthProvider, useAuth } from "@/components/auth/auth.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -41,7 +41,7 @@ function Providers() {
 
 function App() {
     const auth = useAuth()
-    return <RouterProvider router={router} context={{ auth }}/>
+    return <RouterProvider router={ router } context={{ auth }}/>
 }
 
 const rootElement = document.getElementById('root')!

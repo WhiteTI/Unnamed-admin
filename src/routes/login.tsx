@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Card, CardContent, CardHeader } from '@/components/ui/card.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { useAuth } from '@/components/auth.tsx'
+import { useAuth } from '@/components/auth/auth.tsx'
 import { useForm, Controller, SubmitHandler } from 'react-hook-form'
 import { z } from 'zod'
 
