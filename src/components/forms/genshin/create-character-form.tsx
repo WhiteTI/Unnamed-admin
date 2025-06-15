@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, MouseEvent, useEffect} from "react";
 import {useFieldArray, useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -23,6 +23,8 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/co
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import {PlusIcon} from "lucide-react";
+import api from "@/http";
+import {transformImagesInObject} from "@/utils/image-conversion.ts";
 
 type Stat = {
     image: string
@@ -36,6 +38,9 @@ const CreateCharacterForm = () => {
     const [additionalStat, setAdditionalStat] = useState('')
     const [additionalStatError, setAdditionalStatError] = useState('')
 
+    const [textarea, setTextarea] = useState('')
+    // console.log(textarea.replaceAll('\n', '').split(';'))
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -47,10 +52,10 @@ const CreateCharacterForm = () => {
             description: "",
             rarity: "",
             region: "",
-            elementId: "",
-            weaponTypeId: "",
-            levels: Array(8).fill({level: 0, health: 0, attack: 0, defense: 0, additionalStat: ''}),
-            skills: Array(3).fill({name: '', description: '', image: undefined, skillStats: Array(15).fill({level: 0, value: ''})}),
+            elementName: "",
+            weaponTypeName: "",
+            levels: Array(8).fill({level: undefined, health: undefined, attack: undefined, defense: undefined, additionalStat: ''}),
+            skills: Array(3).fill({name: '', description: '', image: undefined, skillStats: Array(15).fill({level: undefined, value: ''})}),
             passiveSkills: Array(2).fill({name: '', description: '', image: undefined}),
             constellations: Array(6).fill({name: '', description: '', image: undefined})
         }
@@ -63,7 +68,7 @@ const CreateCharacterForm = () => {
 
     const {fields: skills, append: appedndSkill} = useFieldArray({
         control: form.control,
-        name: 'skills'
+        name: 'skills' // упростить ввод, а то слишком сложно `(*>﹏<*)′
     })
 
     const {fields: passiveSkills, append: appendPassiveSkill} = useFieldArray({
@@ -76,7 +81,7 @@ const CreateCharacterForm = () => {
         name: 'constellations'
     })
 
-    const setAdditionalStatInForm = (event: React.MouseEvent<HTMLButtonElement>, stat: Stat) => {
+    const setAdditionalStatInForm = (event: MouseEvent<HTMLButtonElement>, stat: Stat) => {
         event.preventDefault()
 
         const rarity = form.getValues('rarity')
@@ -93,16 +98,55 @@ const CreateCharacterForm = () => {
         }
     }
 
+    if (form.formState.isDirty) {
+        localStorage.setItem('formState', JSON.stringify(form.getValues()))
+    }
+
+    useEffect(() => {
+        if (localStorage.getItem('formState')) {
+            const data = JSON.parse(localStorage.getItem('formState')!) as z.infer<typeof formSchema>
+            // console.log(data)
+            for (const [key, value] of Object.entries(data)) {
+                // @ts-ignore
+                form.setValue(key, value)
+            }
+        }
+    }, []);
+
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const levels = data.levels.map(item => ({...item, additionalStat: item.additionalStat.split(',')}))
-        const skills = data.skills.map(skill => {
-            const skillStats = skill.skillStats.map((item => ({level: item.level, value: item.value.split(';')})))
-            return {...skill, skillStats: skillStats}
-        })
+        const {charImages, skillsImages, passiveSkillsImages, constellationsImages} = await transformImagesInObject(data)
+
         const rarity = parseInt(data.rarity)
 
-        const character = {...data, rarity: rarity, levels: levels, skills: skills};
-        console.log(character)
+        const levels = data.levels.map(item => ({...item, additionalStat: item.additionalStat.split(',')}))
+
+        const skills = data.skills.map((skill, i) => {
+            const skillStats = skill.skillStats.map((item => ({level: item.level, value: item.value.split(';')})))
+            return {...skill, image: skillsImages[i], skillStats: skillStats}
+        })
+
+        const passiveSkills = data.passiveSkills.map((item, i) => ({...item, image: passiveSkillsImages[i]}))
+
+        const constellations = data.constellations.map((item, i) => ({...item, image: constellationsImages[i]}))
+
+        const character = {
+            ...data,
+            rarity: rarity,
+            image: charImages[0],
+            bgImage: charImages[1],
+            listImage: charImages[2],
+            levels: levels,
+            skills: skills,
+            passiveSkills: passiveSkills,
+            constellations: constellations,
+        };
+
+
+        try {
+            await api.post('/genshin/characters', character)
+        } catch (e: any) {
+            console.log(e.message)
+        }
     }
 
     return (
@@ -220,7 +264,7 @@ const CreateCharacterForm = () => {
                         </FormItem>
                     )} />
 
-                    <FormField control={form.control} name='elementId' render={({field}) => (
+                    <FormField control={form.control} name='elementName' render={({field}) => (
                         <FormItem>
                             <FormLabel>Элемент</FormLabel>
                             <FormControl>
@@ -230,13 +274,13 @@ const CreateCharacterForm = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value='Pyro'>Pyro</SelectItem>
-                                            <SelectItem value='Hydro'>Hydro</SelectItem>
-                                            <SelectItem value='Dendro'>Dendro</SelectItem>
-                                            <SelectItem value='Electro'>Electro</SelectItem>
-                                            <SelectItem value='Anemo'>Anemo</SelectItem>
-                                            <SelectItem value='Cryo'>Cryo</SelectItem>
-                                            <SelectItem value='Geo'>Geo</SelectItem>
+                                            <SelectItem value='pyro'>Pyro</SelectItem>
+                                            <SelectItem value='hydro'>Hydro</SelectItem>
+                                            <SelectItem value='dendro'>Dendro</SelectItem>
+                                            <SelectItem value='electro'>Electro</SelectItem>
+                                            <SelectItem value='anemo'>Anemo</SelectItem>
+                                            <SelectItem value='cryo'>Cryo</SelectItem>
+                                            <SelectItem value='geo'>Geo</SelectItem>
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -245,7 +289,7 @@ const CreateCharacterForm = () => {
                         </FormItem>
                     )} />
 
-                    <FormField control={form.control} name='weaponTypeId' render={({field}) => (
+                    <FormField control={form.control} name='weaponTypeName' render={({field}) => (
                         <FormItem>
                             <FormLabel>Тип оружия</FormLabel>
                             <FormControl>
@@ -255,11 +299,11 @@ const CreateCharacterForm = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value='Sword'>Sword</SelectItem>
-                                            <SelectItem value='Polearm'>Polearm</SelectItem>
-                                            <SelectItem value='Claymore'>Claymore</SelectItem>
-                                            <SelectItem value='Catalyst'>Catalyst</SelectItem>
-                                            <SelectItem value='Bow'>Bow</SelectItem>
+                                            <SelectItem value='sword'>Sword</SelectItem>
+                                            <SelectItem value='polearm'>Polearm</SelectItem>
+                                            <SelectItem value='claymore'>Claymore</SelectItem>
+                                            <SelectItem value='catalyst'>Catalyst</SelectItem>
+                                            <SelectItem value='bow'>Bow</SelectItem>
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -382,6 +426,8 @@ const CreateCharacterForm = () => {
                                         </FormItem>
                                     )} />
 
+                                    <Textarea value={textarea} onChange={event => setTextarea(event.target.value)}/>
+
                                     <div className='grid grid-cols-2 auto-rows-auto gap-3'>
                                         {skill.skillStats.map((_stat: any, k: number) => (
                                             <div key={k} className='m-2'>
@@ -412,7 +458,14 @@ const CreateCharacterForm = () => {
                                 </div>
                             ))}
                             <div className='flex justify-center gap-4 mt-2'>
-                                <Button type='button' onClick={() => appedndSkill({name: '', description: '', image: undefined, skillStats: Array(15).fill({level: 0, value: ''})})}><PlusIcon/></Button>
+                                <Button
+                                    type='button'
+                                    onClick={() => appedndSkill(
+                                        {name: '', description: '', image: undefined, skillStats: Array(15).fill({level: 0, value: ''})}
+                                    )}
+                                >
+                                    <PlusIcon/>
+                                </Button>
                             </div>
                         </AccordionContent>
                     </AccordionItem>
